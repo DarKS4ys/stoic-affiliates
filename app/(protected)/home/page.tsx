@@ -1,10 +1,13 @@
 import { SignOutButton, currentUser } from '@clerk/nextjs';
 import React from 'react';
+import { AiOutlineAim } from 'react-icons/ai';
 
 export default async function page() {
   const user = await currentUser();
-
-  if (!user) return <div>Not signed in</div>;
-
-  return (<div>Hello {user?.firstName} <SignOutButton/></div>);
+  
+  return (
+    <div>
+      Hello {user?.firstName} <SignOutButton />
+    </div>
+  );
 }
