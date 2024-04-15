@@ -30,7 +30,7 @@ export default async function Sidebar() {
     <div className="h-screen overflow-y-hidden border-r border-border w-64 flex flex-col gap-y-4">
       <div className="flex gap-x-2 items-center">
         <UserButton />
-        <div className='flex flex-col'>
+        <div className='flex flex-col leading-tight'>
           <p className='font-semibold'>{user?.firstName}</p>
           <p className='text-muted-foreground font-light'>{user?.username}</p>
         </div>

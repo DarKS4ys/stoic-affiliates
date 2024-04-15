@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Form,
   FormControl,
@@ -22,6 +22,7 @@ interface StepOneProps {
 }
 
 export default function StepOne({ user, loading, onSubmit }: StepOneProps) {
+  const [disabled, setDisabled] = useState(false)
   const form = useForm<z.infer<typeof StepOneSchema>>({
     resolver: zodResolver(StepOneSchema),
     defaultValues: {
@@ -38,6 +39,16 @@ export default function StepOne({ user, loading, onSubmit }: StepOneProps) {
       });
     }
   }, [form, user]);
+
+  const { firstName: formFirstName } = form.watch();
+
+  useEffect(() => {
+    if (formFirstName.length == 0 ) {
+      setDisabled(true)
+    } else {
+      setDisabled(false)
+    }
+  }, [formFirstName])
 
   return (
     <div className='flex flex-col gap-y-3 w-full'>
@@ -82,7 +93,7 @@ export default function StepOne({ user, loading, onSubmit }: StepOneProps) {
               </FormItem>
             )}
           />
-          <Button disabled={loading} type="submit">
+          <Button disabled={loading || disabled} type="submit">
             Next
           </Button>
         </form>

@@ -19,3 +19,11 @@ export const StepTwoSchema = z.object({
       message: 'Username is required.',
     }),
 });
+
+export const StepThreeSchema = z.object({
+  description: z.optional(
+    z.string().max(499, {
+      message: 'Bio must be shorter than 500 characters.',
+    })
+  ),
+});

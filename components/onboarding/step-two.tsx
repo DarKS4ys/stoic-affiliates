@@ -18,7 +18,6 @@ import { ServerCheckUsernameAvailability } from '@/actions/user';
 import { cn } from '@/lib/utils';
 import { FiCheckCircle, FiLoader } from 'react-icons/fi';
 import {FaRegSadCry} from 'react-icons/fa'
-import { currentUser } from '@clerk/nextjs';
 
 interface StepTwoProps {
   loading: boolean;
@@ -29,12 +28,13 @@ interface StepTwoProps {
 export default function StepTwo({ user, loading, onSubmit }: StepTwoProps) {
   const [usernameMessage, setUsernameMessage] = useState('');
   const [fetching, setFetching] = useState(false)
+  const [disabled, setDisabled] = useState(false)
 
   const usernameAvailable = usernameMessage == 'This name is available!'
 
   const form = useForm<z.infer<typeof StepTwoSchema>>({
     resolver: zodResolver(StepTwoSchema),
-    defaultValues: {},
+    defaultValues: {username: user?.username!},
   });
 
   useEffect(() => {
@@ -46,6 +46,14 @@ export default function StepTwo({ user, loading, onSubmit }: StepTwoProps) {
   }, [form, user]);
 
   const { username: formUsername } = form.watch();
+
+  useEffect(() => {
+    if (formUsername && formUsername.length == 0 ) {
+      setDisabled(true)
+    } else {
+      setDisabled(false)
+    }
+  }, [formUsername])
 
   useEffect(() => {
     const usernameRegex = /^[a-zA-Z0-9]+$/;
@@ -71,9 +79,11 @@ export default function StepTwo({ user, loading, onSubmit }: StepTwoProps) {
           setUsernameMessage('You already have this username!');
         } else if (fetchedUser?.username) {
           setUsernameMessage('This username is already taken');
+          setDisabled(true)
         }
         else {
           setUsernameMessage('This name is available!');
+          setDisabled(false)
         }
       } catch (error) {
         console.error('Error checking username availability:', error);
@@ -122,7 +132,7 @@ export default function StepTwo({ user, loading, onSubmit }: StepTwoProps) {
             </div>
           )}
 
-          <Button disabled={loading} type="submit">
+          <Button disabled={loading || disabled} type="submit">
             Next
           </Button>
         </form>

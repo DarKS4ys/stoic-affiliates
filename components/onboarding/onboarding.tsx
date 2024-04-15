@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import * as z from 'zod';
-import { StepOneSchema, StepTwoSchema } from '@/schemas/onboarding';
+import {
+  StepOneSchema,
+  StepThreeSchema,
+  StepTwoSchema,
+} from '@/schemas/onboarding';
 import { useUser } from '@clerk/nextjs';
 import {
+  ServerCheckUsernameAvailability,
   ServerFetchUserByExternalId,
   updateUser,
   updateUserDB,
+  updateUserMetadata,
 } from '@/actions/user';
 import StepOne from './step-one';
 import { cn } from '@/lib/utils';
@@ -13,6 +19,11 @@ import StepTwo from './step-two';
 import { AnimatePresence, motion } from 'framer-motion';
 import { fetchUserByExternalId } from '@/data/user';
 import { FiLoader } from 'react-icons/fi';
+import StepThree from './step-three';
+import StepFour from './step-four';
+import { Button } from '../ui/button';
+import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/router';
 
 export default function Onboarding() {
   const [loading, setLoading] = useState(false);
@@ -23,6 +34,10 @@ export default function Onboarding() {
   const [step, setStep] = useState<undefined | number>(undefined);
 
   const { user } = useUser();
+
+  const pathname = usePathname()
+
+  const router = useRouter()
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -43,14 +58,35 @@ export default function Onboarding() {
     fetchUserData();
   }, [user]);
 
-  const onSubmit = async (values: z.infer<typeof StepOneSchema | typeof StepTwoSchema>) => {
+  const onSubmit = async (
+    values: z.infer<
+      typeof StepOneSchema | typeof StepTwoSchema | typeof StepThreeSchema
+    >
+  ) => {
     try {
       setLoading(true);
 
-      if (user?.id) {
-        await updateUser(user.id, values);
+      if ('username' in values) {
+        const fetchedUser = await ServerCheckUsernameAvailability(
+          values.username
+        );
 
-        await updateUserDB(user.id, { onboarding: (step || 1) + 1 });
+        if (fetchedUser?.username) {
+          setLoading(false);
+          return;
+        }
+      }
+
+      if (user?.id) {
+        if (step && step < 3) {
+          await updateUser(user.id, values);
+          await updateUserMetadata(user.id, { onboarding: (step || 1) + 1 });
+        } else {
+          await updateUserMetadata(user.id, {
+            ...values,
+            onboarding: (step || 1) + 1,
+          });
+        }
 
         setStep((prevStep) => (prevStep || 1) + 1);
       } else {
@@ -58,6 +94,7 @@ export default function Onboarding() {
         return;
       }
 
+      // ! REPLACE WITH TOAST
       setSuccess('Successfully set the name.');
       setError(undefined);
 
@@ -72,11 +109,10 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="flex flex-col relative gap-y-4 items-center w-full">
+    <div className="flex flex-col relative gap-y-4 items-center h-full w-full">
       {initialLoading && (
         <div className="flex justify-center items-center h-full w-full flex-col gap-y-4">
-          <FiLoader className="animate-spin w-32 h-32" />
-          <h1>Loading...</h1>
+          <FiLoader className="animate-spin w-20 h-20" />
         </div>
       )}
       {!initialLoading && (
@@ -86,9 +122,9 @@ export default function Onboarding() {
               <motion.div
                 transition={{ type: 'spring', damping: 15 }}
                 className="w-full absolute inset-0"
-                initial={{ opacity: 0, x: -500, scale: 0.8 }}
+                initial={{ opacity: 0, x: -500, scale: 0.75 }}
                 animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ x: -500, opacity: 0, scale: 0.8 }}
+                exit={{ x: -500, opacity: 0, scale: 0.75 }}
               >
                 <StepOne loading={loading} user={user} onSubmit={onSubmit} />
               </motion.div>
@@ -100,16 +136,61 @@ export default function Onboarding() {
               <motion.div
                 transition={{ type: 'spring', damping: 15 }}
                 className="w-full absolute inset-0"
-                initial={{ opacity: 0, x: 500, scale: 0.8 }}
+                initial={{ opacity: 0, x: 500, scale: 0.75 }}
                 animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ x: -500, opacity: 0, scale: 0.8 }}
+                exit={{ x: -500, opacity: 0, scale: 0.75 }}
               >
                 <StepTwo loading={loading} user={user} onSubmit={onSubmit} />
               </motion.div>
             )}
           </AnimatePresence>
 
-          <p className="absolute bottom-0 text-xs">{!step ? 'Loading... ' : `${step} out of 5 complete`}</p>
+          <AnimatePresence>
+            {step == 3 && (
+              <motion.div
+                transition={{ type: 'spring', damping: 15 }}
+                className="w-full absolute inset-0"
+                initial={{ opacity: 0, x: 500, scale: 0.8 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ x: -500, opacity: 0, scale: 0.75 }}
+              >
+                <StepThree loading={loading} user={user} onSubmit={onSubmit} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {step == 4 && (
+              <motion.div
+                transition={{ type: 'spring', damping: 15 }}
+                className="w-full absolute inset-0"
+                initial={{ opacity: 0, x: 500, scale: 0.8 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ x: -500, opacity: 0, scale: 0.75 }}
+              >
+                <StepFour user={user} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {step && (
+            <>
+              {step <= 3 && (
+                <p className="absolute bottom-0 text-xs">
+                  {`${step} out of 3 complete`}
+                </p>
+              )}
+
+              {step > 3 && (
+                <Button
+                  onClick={() => router.push(pathname)}
+                  className="absolute bottom-0 right-0 text-xs"
+                >
+                  Finish
+                </Button>
+              )}
+            </>
+          )}
         </>
       )}
     </div>

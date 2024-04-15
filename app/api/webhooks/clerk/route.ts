@@ -41,12 +41,16 @@ async function handler(request: Request) {
     const username = attributes.username || undefined;
     const image_url = attributes.image_url || '';
     const email = attributes.email_addresses[0].email_address || '';
+    const onboarding = attributes.private_metadata.onboarding || 1
+    const description = attributes.private_metadata.description || ''
 
     console.log(first_name);
     console.log(last_name);
     console.log(username);
     console.log(image_url);
     console.log(email);
+    console.log(onboarding)
+    console.log(description)
 
     await db.user.upsert({
       where: { externalId: id as string },
@@ -56,6 +60,8 @@ async function handler(request: Request) {
         first_name: first_name as string,
         last_name: last_name as string,
         image: image_url as string,
+        onboarding: onboarding as number,
+        description: description as string
       },
       update: {
         email: email,
@@ -64,6 +70,8 @@ async function handler(request: Request) {
         last_name: last_name as string,
         username: username as string,
         image: image_url as string,
+        onboarding: onboarding as number,
+        description: description as string
       },
     });
 
