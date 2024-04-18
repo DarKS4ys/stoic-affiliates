@@ -7,7 +7,7 @@ export default async function page() {
   
   return (
     <div>
-      Hello {user?.firstName} <SignOutButton />
+      Hello{/*  {user?.firstName} <SignOutButton /> */}
     </div>
   );
 }

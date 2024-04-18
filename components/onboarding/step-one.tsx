@@ -14,6 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { StepOneSchema } from '@/schemas/onboarding';
 import { UserResource } from '@clerk/types/dist/user';
+import { FiLoader } from 'react-icons/fi';
 
 interface StepOneProps {
   loading: boolean;
@@ -22,7 +23,7 @@ interface StepOneProps {
 }
 
 export default function StepOne({ user, loading, onSubmit }: StepOneProps) {
-  const [disabled, setDisabled] = useState(false)
+  const [disabled, setDisabled] = useState(false);
   const form = useForm<z.infer<typeof StepOneSchema>>({
     resolver: zodResolver(StepOneSchema),
     defaultValues: {
@@ -43,15 +44,15 @@ export default function StepOne({ user, loading, onSubmit }: StepOneProps) {
   const { firstName: formFirstName } = form.watch();
 
   useEffect(() => {
-    if (formFirstName.length == 0 ) {
-      setDisabled(true)
+    if (formFirstName.length == 0) {
+      setDisabled(true);
     } else {
-      setDisabled(false)
+      setDisabled(false);
     }
-  }, [formFirstName])
+  }, [formFirstName]);
 
   return (
-    <div className='flex flex-col gap-y-3 w-full'>
+    <div className="flex flex-col gap-y-3 w-full">
       <h1 className="text-xl font-semibold">Create your account</h1>
       <Form {...form}>
         <form
@@ -94,7 +95,14 @@ export default function StepOne({ user, loading, onSubmit }: StepOneProps) {
             )}
           />
           <Button disabled={loading || disabled} type="submit">
-            Next
+            {loading ? (
+              <div className="flex gap-x-2">
+                <p>Loading...</p>
+                <FiLoader className="animate-spin" />
+              </div>
+            ) : (
+              'Continue'
+            )}
           </Button>
         </form>
       </Form>

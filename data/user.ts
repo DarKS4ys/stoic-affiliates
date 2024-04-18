@@ -16,7 +16,7 @@ export const fetchUserByExternalId = async (externalId: string) => {
     return user
 }
 
-export const isUsernameTaken = async (username: string) => {
+export const findUserWithUsername = async (username: string) => {
     try {
         const user = await db.user.findFirst({
           where: {

@@ -14,6 +14,7 @@ import * as z from 'zod';
 import { StepThreeSchema } from '@/schemas/onboarding';
 import { UserResource } from '@clerk/types/dist/user';
 import { Textarea } from '../ui/textarea';
+import { FiLoader } from 'react-icons/fi';
 
 interface StepThreeProps {
   loading: boolean;
@@ -53,9 +54,15 @@ export default function StepThree({ user, loading, onSubmit }: StepThreeProps) {
               </FormItem>
             )}
           />
-
           <Button disabled={loading} type="submit">
-            Complete
+          {loading ? (
+              <div className="flex gap-x-2">
+                <p>Loading...</p>
+                <FiLoader className="animate-spin" />
+              </div>
+            ) : (
+              'Continue'
+            )}
           </Button>
         </form>
       </Form>

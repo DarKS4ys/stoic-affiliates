@@ -3,7 +3,7 @@
 import {
   fetchUserByExternalId,
   fetchUserById,
-  isUsernameTaken,
+  findUserWithUsername,
 } from '@/data/user';
 import { db } from '@/lib/prisma';
 import { clerkClient } from '@clerk/nextjs/server';
@@ -44,8 +44,8 @@ export const ServerFetchUserById = async (id: string) => {
   return user;
 };
 
-export const ServerCheckUsernameAvailability = async (username: string) => {
-  const fetchedUsername = await isUsernameTaken(username);
+export const ServerGetUserWithUsername = async (username: string) => {
+  const fetchedUser = await findUserWithUsername(username);
 
-  return fetchedUsername;
+  return fetchedUser;
 };

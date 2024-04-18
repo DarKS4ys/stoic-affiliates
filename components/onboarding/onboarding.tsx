@@ -7,23 +7,17 @@ import {
 } from '@/schemas/onboarding';
 import { useUser } from '@clerk/nextjs';
 import {
-  ServerCheckUsernameAvailability,
+  ServerGetUserWithUsername,
   ServerFetchUserByExternalId,
   updateUser,
-  updateUserDB,
   updateUserMetadata,
 } from '@/actions/user';
 import StepOne from './step-one';
-import { cn } from '@/lib/utils';
 import StepTwo from './step-two';
 import { AnimatePresence, motion } from 'framer-motion';
-import { fetchUserByExternalId } from '@/data/user';
 import { FiLoader } from 'react-icons/fi';
 import StepThree from './step-three';
 import StepFour from './step-four';
-import { Button } from '../ui/button';
-import { usePathname } from 'next/navigation';
-import { useRouter } from 'next/router';
 
 export default function Onboarding() {
   const [loading, setLoading] = useState(false);
@@ -34,10 +28,6 @@ export default function Onboarding() {
   const [step, setStep] = useState<undefined | number>(undefined);
 
   const { user } = useUser();
-
-  const pathname = usePathname()
-
-  const router = useRouter()
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -67,7 +57,7 @@ export default function Onboarding() {
       setLoading(true);
 
       if ('username' in values) {
-        const fetchedUser = await ServerCheckUsernameAvailability(
+        const fetchedUser = await ServerGetUserWithUsername(
           values.username
         );
 
@@ -179,15 +169,6 @@ export default function Onboarding() {
                 <p className="absolute bottom-0 text-xs">
                   {`${step} out of 3 complete`}
                 </p>
-              )}
-
-              {step > 3 && (
-                <Button
-                  onClick={() => router.push(pathname)}
-                  className="absolute bottom-0 right-0 text-xs"
-                >
-                  Finish
-                </Button>
               )}
             </>
           )}

@@ -6,8 +6,8 @@ import { ClerkProvider } from '@clerk/nextjs';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Threads',
-  description: 'Twitter clone elon musk best dont sue',
+  title: 'STOIC AFFILIATES',
+  description: 'Stoiccord affiliate system',
 };
 
 export default function RootLayout({

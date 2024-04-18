@@ -14,10 +14,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { StepTwoSchema } from '@/schemas/onboarding';
 import { UserResource } from '@clerk/types/dist/user';
-import { ServerCheckUsernameAvailability } from '@/actions/user';
+import { ServerGetUserWithUsername } from '@/actions/user';
 import { cn } from '@/lib/utils';
 import { FiCheckCircle, FiLoader } from 'react-icons/fi';
-import {FaRegSadCry} from 'react-icons/fa'
+import { FaRegSadCry } from 'react-icons/fa';
 
 interface StepTwoProps {
   loading: boolean;
@@ -27,14 +27,14 @@ interface StepTwoProps {
 
 export default function StepTwo({ user, loading, onSubmit }: StepTwoProps) {
   const [usernameMessage, setUsernameMessage] = useState('');
-  const [fetching, setFetching] = useState(false)
-  const [disabled, setDisabled] = useState(false)
+  const [fetching, setFetching] = useState(false);
+  const [disabled, setDisabled] = useState(false);
 
-  const usernameAvailable = usernameMessage == 'This name is available!'
+  const usernameAvailable = usernameMessage == 'This name is available!';
 
   const form = useForm<z.infer<typeof StepTwoSchema>>({
     resolver: zodResolver(StepTwoSchema),
-    defaultValues: {username: user?.username!},
+    defaultValues: { username: user?.username! },
   });
 
   useEffect(() => {
@@ -48,12 +48,12 @@ export default function StepTwo({ user, loading, onSubmit }: StepTwoProps) {
   const { username: formUsername } = form.watch();
 
   useEffect(() => {
-    if (formUsername && formUsername.length == 0 ) {
-      setDisabled(true)
+    if (formUsername && formUsername.length == 0) {
+      setDisabled(true);
     } else {
-      setDisabled(false)
+      setDisabled(false);
     }
-  }, [formUsername])
+  }, [formUsername]);
 
   useEffect(() => {
     const usernameRegex = /^[a-zA-Z0-9]+$/;
@@ -72,24 +72,28 @@ export default function StepTwo({ user, loading, onSubmit }: StepTwoProps) {
 
     const checkUsernameAvailability = async () => {
       try {
-        setFetching(true)
-        const fetchedUser = await ServerCheckUsernameAvailability(formUsername);
+        setFetching(true);
+        const fetchedUser = await ServerGetUserWithUsername(formUsername);
+
+        if (!formUsername) {
+          setUsernameMessage('');
+          return;
+        }
 
         if (fetchedUser && user?.username == fetchedUser.username) {
           setUsernameMessage('You already have this username!');
         } else if (fetchedUser?.username) {
           setUsernameMessage('This username is already taken');
-          setDisabled(true)
-        }
-        else {
+          setDisabled(true);
+        } else {
           setUsernameMessage('This name is available!');
-          setDisabled(false)
+          setDisabled(false);
         }
       } catch (error) {
         console.error('Error checking username availability:', error);
         setUsernameMessage('Error checking username availability');
       } finally {
-        setFetching(false)
+        setFetching(false);
       }
     };
 
@@ -122,18 +126,36 @@ export default function StepTwo({ user, loading, onSubmit }: StepTwoProps) {
             )}
           />
           {usernameMessage && (
-            <div className={cn("flex gap-x-2 items-center px-4 py-2 text-sm rounded-lg", usernameAvailable ? 'bg-green-500/30 border border-green-500 ' : 'bg-red-500/30 border border-red-500 ')}>
-              {fetching ? <FiLoader size={18} className='animate-spin'/> : usernameAvailable ?
-            <FiCheckCircle size={18}/>  
-            :
-            <FaRegSadCry size={18}/>
-            }
-              <p>{usernameMessage && !fetching ? usernameMessage : 'Checking...'}</p>
+            <div
+              className={cn(
+                'flex gap-x-2 items-center px-4 py-2 text-sm rounded-lg',
+                usernameAvailable
+                  ? 'bg-green-500/30 border border-green-500 '
+                  : 'bg-red-500/30 border border-red-500 '
+              )}
+            >
+              {fetching ? (
+                <FiLoader size={18} className="animate-spin" />
+              ) : usernameAvailable ? (
+                <FiCheckCircle size={18} />
+              ) : (
+                <FaRegSadCry size={18} />
+              )}
+              <p>
+                {usernameMessage && !fetching ? usernameMessage : 'Checking...'}
+              </p>
             </div>
           )}
 
           <Button disabled={loading || disabled} type="submit">
-            Next
+          {loading ? (
+              <div className="flex gap-x-2">
+                <p>Loading...</p>
+                <FiLoader className="animate-spin" />
+              </div>
+            ) : (
+              'Continue'
+            )}
           </Button>
         </form>
       </Form>
