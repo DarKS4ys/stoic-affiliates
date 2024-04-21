@@ -56,7 +56,7 @@ export default function StepThree({ user, loading, onSubmit }: StepThreeProps) {
           />
           <Button disabled={loading} type="submit">
           {loading ? (
-              <div className="flex gap-x-2">
+              <div className="flex items-center gap-x-2">
                 <p>Loading...</p>
                 <FiLoader className="animate-spin" />
               </div>

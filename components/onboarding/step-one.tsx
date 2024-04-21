@@ -96,7 +96,7 @@ export default function StepOne({ user, loading, onSubmit }: StepOneProps) {
           />
           <Button disabled={loading || disabled} type="submit">
             {loading ? (
-              <div className="flex gap-x-2">
+              <div className="flex items-center gap-x-2">
                 <p>Loading...</p>
                 <FiLoader className="animate-spin" />
               </div>

@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Logo from '@/public/STOIC WHITE.png';
 import Image from 'next/image';
-import { BsChevronBarLeft, BsFillExclamationOctagonFill } from 'react-icons/bs';
+import { BsChevronBarLeft } from 'react-icons/bs';
 import { cn } from '@/lib/utils';
 import { MdPerson, MdPersonOutline } from 'react-icons/md';
 import {
@@ -20,14 +20,15 @@ import {
   AiOutlineTrophy,
 } from 'react-icons/ai';
 import { Montserrat } from 'next/font/google';
-import { SignOutButton, UserButton, UserProfile } from '@clerk/nextjs';
+import { UserButton, UserProfile } from '@clerk/nextjs';
 import { BiLogOut } from 'react-icons/bi';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Dialog, DialogClose, DialogContent, DialogTrigger } from './ui/dialog';
-import { Button } from './ui/button';
+import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
 import { FiLoader } from 'react-icons/fi';
+import SignoutModal from './signout-modal';
+import {IoMdAnalytics} from 'react-icons/io'
 
 const montserrat = Montserrat({ weight: '600', subsets: ['latin'] });
 
@@ -62,6 +63,12 @@ export default function Sidebar({
       icon: <AiOutlineHome />,
       icon_hover: <AiFillHome />,
       href: '/dashboard',
+    },
+    {
+      title: 'Analytics',
+      icon: <IoMdAnalytics />,
+      icon_hover: <IoMdAnalytics />,
+      href: '/analytics',
     },
     {
       title: 'Notifications',
@@ -224,32 +231,7 @@ export default function Sidebar({
                   </button>
                 </DialogTrigger>
                 <DialogContent closeButton>
-                  <div className="flex justify-center items-center text-center flex-col gap-y-5">
-                    <div className="bg-red-200/40 rounded-full w-16 h-16 flex items-center justify-center mr-2">
-                      <BsFillExclamationOctagonFill className="fill-red-500 w-8 h-8" />
-                    </div>
-                    <h1 className="text-xl font-semibold">Sign out?</h1>
-
-                    <h1 className="text-muted-foreground font-light">
-                      Are you sure you want to sign out of your current account
-                      {username && `, ${firstName}`}? You will need to login
-                      with your password/provider again.
-                    </h1>
-
-                    <hr className="w-full border-t" />
-                    <div className="flex gap-x-4">
-                      {initialized ? (
-                        <SignOutButton>
-                          <Button variant="destructive">Sign Out</Button>
-                        </SignOutButton>
-                      ) : (
-                        <Button variant="destructive">Sign Out</Button>
-                      )}
-                      <DialogClose asChild>
-                        <Button>Cancel</Button>
-                      </DialogClose>
-                    </div>
-                  </div>
+                  <SignoutModal initialized={initialized} firstName={firstName} username={username}/>
                 </DialogContent>
               </Dialog>
             </div>
