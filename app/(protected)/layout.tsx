@@ -12,17 +12,20 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  
   const user = await currentUser();
 
   return (
     <html lang="en">
       <body>
         <OnboardingWrapper>
-          <div className="flex">
-            <Sidebar firstName={user?.firstName} lastName={user?.lastName} username={user?.lastName}/>
+          <main className="flex">
+              <Sidebar
+                firstName={user?.firstName}
+                lastName={user?.lastName}
+                username={user?.username}
+              />
             {children}
-          </div>
+          </main>
         </OnboardingWrapper>
       </body>
     </html>
