@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import Logo from '@/public/STOIC WHITE.png';
 import Image from 'next/image';
 import { BsChevronBarLeft } from 'react-icons/bs';
-import { cn } from '@/lib/utils';
+import { cn, truncateText } from '@/lib/utils';
 import { MdPerson, MdPersonOutline } from 'react-icons/md';
 import {
   RiNotification2Fill,
@@ -86,7 +86,7 @@ export default function Sidebar({
       title: 'Comissions',
       icon: <RiPercentLine />,
       icon_hover: <RiPercentFill />,
-      href: '/leaderboard',
+      href: '/comissions',
     },
     {
       title: 'Profile',
@@ -219,8 +219,8 @@ export default function Sidebar({
             >
               <div className="flex flex-col leading-tight ">
                 <h2 className="text-sm font-medium line-clamp-1">{`${firstName} ${lastName}`}</h2>
-                <h3 className="text-muted-foreground line-clamp-1 font-light text-xs">
-                  #{username}
+                <h3 className="text-muted-foreground line-clamp-1 truncate font-light text-xs">
+                  #{truncateText(username, 25)}
                 </h3>
               </div>
 

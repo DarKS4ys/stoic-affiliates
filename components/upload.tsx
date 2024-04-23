@@ -6,15 +6,20 @@ import { cn } from './../lib/utils';
 import Image from 'next/image';
 import { Button } from './ui/button';
 import { Progress } from './ui/progress';
+import { BiLoader } from 'react-icons/bi';
 
 export default function Upload({
   title,
   onFileSelected,
-  progress
+  progress,
+  complete,
+  closeModal
 }: {
   title: string;
   onFileSelected: (file: File) => void;
-  progress?: undefined | number
+  complete: boolean;
+  progress?: undefined | number;
+  closeModal: () => void
 }) {
   const [loading, setLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -51,9 +56,8 @@ export default function Upload({
       if (file) {
         handleFileUpload(file);
       } else {
-        console.log('No file dropped');
+        
       }
-      console.log(acceptedFiles);
     },
   });
 
@@ -84,7 +88,11 @@ export default function Upload({
               fill
               className="p-2 rounded-lg flex max-h-[16rem] w-full object-contain mx-auto"
             />
-            <div className="pt-60"><p className="group-hover:text-primary transition text-sm text-muted-foreground">Click again to select another image</p></div>
+            <div className="pt-60">
+              <p className="group-hover:text-primary transition text-sm text-muted-foreground">
+                Click again to select another image
+              </p>
+            </div>
           </div>
         ) : (
           <>
@@ -97,17 +105,21 @@ export default function Upload({
                 <p className="text-red-600 font-medium">File not accepted!</p>
               )
             ) : (
-              <p className='font-medium'>Drag & drop a file here, or click to select a file</p>
+              <p className="font-medium">
+                Drag & drop a file here, or click to select a file
+              </p>
             )}
           </>
         )}
       </div>
 
-      <Button disabled={loading || !selectedImage} className="w-full">Upload</Button>
+      {/* <Button disabled={loading || !selectedImage} className="w-full">Upload</Button> */}
 
-      {progress &&
-        <Progress value={progress}/>
-      }
+      {progress !== undefined && progress !== null && progress !== 100 && progress > 1 && (<Progress value={progress} />) }
+
+      <Button onClick={closeModal} disabled={!complete} className="w-full">
+        {loading ? <div className='flex space-x-1.5 items-center'><BiLoader className='animate-spin'/>Loading</div> : <p>Complete</p>}
+      </Button>
     </div>
   );
 }

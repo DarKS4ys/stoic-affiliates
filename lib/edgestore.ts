@@ -1,9 +1,11 @@
 'use client';
 
+import { type EdgeStoreRouter } from '../app/api/edgestore/[...edgestore]/route';
 import { createEdgeStoreProvider } from '@edgestore/react';
-import { EdgeStoreRouter } from './edgestore-server';
 
 const { EdgeStoreProvider, useEdgeStore } =
-  createEdgeStoreProvider<EdgeStoreRouter>();
+  createEdgeStoreProvider<EdgeStoreRouter>({
+    maxConcurrentUploads: 20
+  });
 
 export { EdgeStoreProvider, useEdgeStore };

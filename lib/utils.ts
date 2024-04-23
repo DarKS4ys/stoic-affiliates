@@ -20,3 +20,10 @@ export const formatDate = (dateString: Date) => {
 
   return formattedDate;
 };
+
+export function truncateText(text: string | undefined | null, maxLength: number) {
+  if (text && text.length > maxLength) {
+    return text.substring(0, maxLength) + '...';
+  }
+  return text;
+}

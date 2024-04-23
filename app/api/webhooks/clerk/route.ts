@@ -43,6 +43,7 @@ async function handler(request: Request) {
     const email = attributes.email_addresses[0].email_address || '';
     const onboarding = attributes.private_metadata.onboarding || 1
     const description = attributes.private_metadata.description || ''
+    const banner = attributes.private_metadata.banner || ''
 
     console.log(first_name);
     console.log(last_name);
@@ -53,25 +54,26 @@ async function handler(request: Request) {
     console.log(description)
 
     await db.user.upsert({
-      where: { externalId: id as string },
+      where: { externalId: id },
       create: {
         email: email,
-        externalId: id as string,
-        first_name: first_name as string,
-        last_name: last_name as string,
-        image: image_url as string,
-        onboarding: onboarding as number,
-        description: description as string
+        externalId: id,
+        first_name: first_name,
+        last_name: last_name,
+        image: image_url,
+        onboarding: onboarding,
+        description: description
       },
       update: {
         email: email,
-        externalId: id as string,
-        first_name: first_name as string,
-        last_name: last_name as string,
-        username: username as string,
-        image: image_url as string,
-        onboarding: onboarding as number,
-        description: description as string
+        externalId: id,
+        first_name: first_name,
+        last_name: last_name,
+        username: username,
+        image: image_url,
+        onboarding: onboarding,
+        description: description,
+        banner: banner
       },
     });
 

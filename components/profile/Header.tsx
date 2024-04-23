@@ -8,23 +8,39 @@ import { UserProfile } from '@clerk/nextjs';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import type { User } from '@prisma/client';
 import BannerUpload from '../banner-upload';
+import { truncateText } from './../../lib/utils';
 
-export default function Header({authorized, user}: {authorized: boolean, user: User}) {
+export default function Header({
+  authorized,
+  user,
+}: {
+  authorized: boolean;
+  user: User;
+}) {
   return (
     <>
       <div className="group max-w-[54.85rem] mx-auto rounded-lg w-full h-60 absolute overflow-hidden inset-0">
-        <Image
-          alt="Default Banner"
-          fill
-          src={DefaultBanner}
-          placeholder={'blur'}
-          className="object-cover h-60"
-        />
+        {user.banner ? (
+          <Image
+            alt="User Banner"
+            fill
+            src={user.banner}
+            className="object-cover h-60"
+          />
+        ) : (
+          <Image
+            alt="Default Banner"
+            fill
+            src={DefaultBanner}
+            placeholder={'blur'}
+            className="object-cover h-60"
+          />
+        )}
 
         <div className="relative w-full h-full group">
           <div className="flex items-center justify-center group-hover:opacity-100 group-hover:scale-100 opacity-0 transition scale-150 absolute inset-0 w-full h-full bg-background/70">
             <div className="mb-[10%]">
-              <BannerUpload user={user}/>
+              <BannerUpload user={user} />
             </div>
           </div>
         </div>
@@ -62,7 +78,7 @@ export default function Header({authorized, user}: {authorized: boolean, user: U
         <ul className="flex gap-x-4 mt-2 items-center text-sm text-muted-foreground">
           <li className="flex items-center gap-x-1.5">
             <FaTag className="w-3 h-3" />
-            {user.username}
+            {truncateText(user.username, 20)}
           </li>
           <li className="flex items-center gap-x-1.5">
             <FaRegCalendarAlt />
