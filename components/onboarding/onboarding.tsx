@@ -18,6 +18,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { FiLoader } from 'react-icons/fi';
 import StepThree from './step-three';
 import StepFour from './step-four';
+import { useRouter } from 'next/navigation';
 
 export default function Onboarding() {
   const [loading, setLoading] = useState(false);
@@ -28,6 +29,7 @@ export default function Onboarding() {
   const [step, setStep] = useState<undefined | number>(undefined);
 
   const { user } = useUser();
+  const router = useRouter()
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -78,6 +80,10 @@ export default function Onboarding() {
           });
         }
 
+        if (step && step == 3) {
+          router.refresh()
+        }
+
         setStep((prevStep) => (prevStep || 1) + 1);
       } else {
         setError('You are not allowed to perform this action.');
@@ -91,6 +97,7 @@ export default function Onboarding() {
       setTimeout(() => {
         setSuccess(undefined);
       }, 3000);
+
     } catch {
       setError('Failed to proceed with the action, please try again later.');
     } finally {

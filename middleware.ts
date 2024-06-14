@@ -8,12 +8,14 @@ import { NextRequest, NextResponse } from 'next/server';
 export default authMiddleware({
   debug: false,
 
-  publicRoutes: ['/sign-in', '/sign-up', '/api/webhooks/clerk'],
+  publicRoutes: ['/landing', '/sign-in', '/sign-up', '/api/webhooks/clerk'],
 
   afterAuth: async (auth, req, evt) => {
     // ? handle unauthenticated users
     if (!auth.userId && !auth.isPublicRoute) {
-      return redirectToSignIn({ returnBackUrl: req.url });
+      const url = new URL('/landing', req.url);
+      return NextResponse.redirect(url);
+      /* return redirectToSignIn({ returnBackUrl: req.url }); */
     }
 
     // ? handle users that havent finished onboarding
@@ -49,5 +51,10 @@ export default authMiddleware({
 
 // ? default matcher from clerk
 export const config = {
-  matcher: ['/((?!.+.[w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
-};
+  matcher: [
+    '/((?!.*\\..*|_next|api/webhooks/clerk).*)', // Match everything except files with extensions, _next, and webhooks
+    '/', 
+    '/(api|trpc)(.*)' // Match api and trpc routes
+  ],
+/*   matcher: ['/((?!.+.[w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+ */};

@@ -42,15 +42,24 @@ export default function Sidebar({
   username: string | null | undefined;
 }) {
   // ! causes the screen to blink white on refresh :(
-  const [expanded, setExpanded] = useState<boolean>(true);
+  /* const [expanded, setExpanded] = useState<boolean>(true); */
 
-  /*   const [expanded, setExpanded] = useState<boolean>(() => {
-    const storedValue = localStorage.getItem('sidebarExpanded');
-    return storedValue !== null ? JSON.parse(storedValue) : true;
-  }); */
+
+  // fixed ssr issue with localstorage
+  const [expanded, setExpanded] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const storedValue = localStorage && localStorage.getItem('sidebarExpanded');
+
+      return storedValue !== null ? JSON.parse(storedValue) : true;
+    } else {
+      return true
+    }
+  });
 
   useEffect(() => {
-    localStorage.setItem('sidebarExpanded', JSON.stringify(expanded));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('sidebarExpanded', JSON.stringify(expanded));
+    }
   }, [expanded]);
 
   const [initialized, setInitialized] = useState(false);
@@ -59,10 +68,10 @@ export default function Sidebar({
 
   const routes = [
     {
-      title: 'Dashboard',
+      title: 'Overview',
       icon: <AiOutlineHome />,
       icon_hover: <AiFillHome />,
-      href: '/dashboard',
+      href: '/overview',
     },
     {
       title: 'Analytics',
@@ -86,6 +95,7 @@ export default function Sidebar({
       title: 'Comissions',
       icon: <RiPercentLine />,
       icon_hover: <RiPercentFill />,
+      alert: true,
       href: '/comissions',
     },
     {
